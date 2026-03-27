@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shark Tank India — Investment Intelligence Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+–navy: #0D1B2A;
+–navy-mid: #152238;
+–navy-light: #1E3358;
+–charcoal: #2C3E50;
+–charcoal-light: #374B5C;
+–black: #080C12;
+–white: #F5F7FA;
+–off-white: #E8ECF2;
+–gold: #C9A84C;
+–gold-light: #E3C06A;
+–gold-dim: #7A6030;
+–text-primary: #E8ECF2;
+–text-secondary: #8DA0B4;
+–text-dim: #4E6478;
+–border: rgba(255,255,255,0.07);
+–border-gold: rgba(201,168,76,0.3);
+–card-bg: rgba(21,34,56,0.85);
+–card-border: rgba(255,255,255,0.06);
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background-color: var(–black);
+background-image:
+radial-gradient(ellipse at 15% 20%, rgba(13,27,42,0.9) 0%, transparent 60%),
+radial-gradient(ellipse at 85% 80%, rgba(30,51,88,0.4) 0%, transparent 60%),
+repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.015) 60px),
+repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.015) 60px);
+font-family: ‘IBM Plex Sans’, sans-serif;
+color: var(–text-primary);
+min-height: 100vh;
+padding: 28px;
+}
+
+/* HEADER */
+.header {
+display: flex;
+justify-content: space-between;
+align-items: flex-end;
+border-bottom: 1px solid var(–border-gold);
+padding-bottom: 18px;
+margin-bottom: 24px;
+}
+.header-left {}
+.header-eyebrow {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 10px;
+letter-spacing: 3px;
+color: var(–gold);
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+.header-title {
+font-family: ‘Playfair Display’, serif;
+font-size: 32px;
+font-weight: 800;
+color: var(–white);
+line-height: 1.1;
+letter-spacing: -0.5px;
+}
+.header-title span { color: var(–gold); }
+.header-subtitle {
+font-size: 12px;
+color: var(–text-secondary);
+margin-top: 5px;
+font-weight: 300;
+}
+.header-right {
+text-align: right;
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 10px;
+color: var(–text-dim);
+letter-spacing: 1px;
+}
+.header-right .season-badge {
+background: linear-gradient(135deg, var(–gold-dim), var(–gold));
+color: var(–black);
+font-weight: 600;
+padding: 4px 12px;
+border-radius: 2px;
+font-size: 10px;
+letter-spacing: 2px;
+display: inline-block;
+margin-bottom: 6px;
+}
+
+/* KPI ROW */
+.kpi-row {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 12px;
+margin-bottom: 20px;
+}
+.kpi-card {
+background: var(–card-bg);
+border: 1px solid var(–card-border);
+border-top: 2px solid var(–border-gold);
+padding: 16px 18px;
+position: relative;
+overflow: hidden;
+}
+.kpi-card::before {
+content: ‘’;
+position: absolute;
+top: 0; right: 0;
+width: 40px; height: 40px;
+background: radial-gradient(circle at top right, rgba(201,168,76,0.08), transparent);
+}
+.kpi-label {
+font-size: 9px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–text-dim);
+font-family: ‘IBM Plex Mono’, monospace;
+margin-bottom: 8px;
+}
+.kpi-value {
+font-family: ‘Playfair Display’, serif;
+font-size: 30px;
+font-weight: 700;
+color: var(–white);
+line-height: 1;
+margin-bottom: 4px;
+}
+.kpi-value.gold { color: var(–gold); }
+.kpi-sub {
+font-size: 10px;
+color: var(–text-secondary);
+font-weight: 300;
+}
+.kpi-badge {
+display: inline-block;
+background: rgba(201,168,76,0.15);
+border: 1px solid rgba(201,168,76,0.3);
+color: var(–gold-light);
+font-size: 9px;
+padding: 2px 7px;
+font-family: ‘IBM Plex Mono’, monospace;
+letter-spacing: 1px;
+margin-top: 4px;
+}
+
+/* MAIN GRID */
+.main-grid {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+grid-template-rows: auto auto auto;
+gap: 16px;
+}
+
+/* CHART CARDS */
+.chart-card {
+background: var(–card-bg);
+border: 1px solid var(–card-border);
+padding: 20px;
+position: relative;
+}
+.chart-card.wide { grid-column: span 2; }
+.chart-card.full { grid-column: span 3; }
+
+.card-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 16px;
+padding-bottom: 10px;
+border-bottom: 1px solid var(–border);
+}
+.card-title {
+font-size: 11px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–text-secondary);
+font-family: ‘IBM Plex Mono’, monospace;
+font-weight: 500;
+}
+.card-tag {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 8px;
+letter-spacing: 1.5px;
+color: var(–gold);
+background: rgba(201,168,76,0.1);
+padding: 2px 8px;
+border: 1px solid rgba(201,168,76,0.2);
+}
+
+.insight-box {
+margin-top: 14px;
+padding: 10px 14px;
+border-left: 2px solid var(–gold);
+background: rgba(201,168,76,0.04);
+}
+.insight-label {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 8px;
+letter-spacing: 2px;
+color: var(–gold-dim);
+text-transform: uppercase;
+margin-bottom: 4px;
+}
+.insight-text {
+font-size: 11px;
+color: var(–text-secondary);
+line-height: 1.55;
+font-style: italic;
+}
+
+/* SVG CHARTS */
+svg { display: block; }
+.chart-svg { width: 100%; overflow: visible; }
+
+/* BAR CHART */
+.bar-fill { transition: opacity 0.2s; }
+.bar-fill:hover { opacity: 0.8; }
+
+/* AXIS */
+.axis-text { font-family: ‘IBM Plex Mono’, monospace; font-size: 9px; fill: #4E6478; }
+.axis-label { font-family: ‘IBM Plex Mono’, monospace; font-size: 8px; fill: #6A8099; letter-spacing: 1px; }
+.grid-line { stroke: rgba(255,255,255,0.04); stroke-width: 1; }
+.value-label { font-family: ‘IBM Plex Mono’, monospace; font-size: 9px; fill: #8DA0B4; }
+
+/* SHARK TABLE */
+.shark-table { width: 100%; border-collapse: collapse; }
+.shark-table th {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 8px;
+letter-spacing: 1.5px;
+color: var(–text-dim);
+text-transform: uppercase;
+text-align: left;
+padding: 0 0 10px 0;
+border-bottom: 1px solid var(–border);
+}
+.shark-table th:not(:first-child) { text-align: right; }
+.shark-table td {
+padding: 8px 0;
+border-bottom: 1px solid rgba(255,255,255,0.03);
+font-size: 12px;
+color: var(–text-primary);
+}
+.shark-table td:not(:first-child) { text-align: right; font-family: ‘IBM Plex Mono’, monospace; font-size: 11px; }
+.shark-name { font-weight: 500; }
+.rank-num { color: var(–text-dim); font-size: 10px; font-family: ‘IBM Plex Mono’, monospace; margin-right: 8px; }
+.rate-bar-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.rate-bar-bg { width: 60px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 0; overflow: hidden; }
+.rate-bar-fill { height: 100%; background: linear-gradient(90deg, var(–navy-light), var(–gold)); }
+.top-shark { color: var(–gold); }
+
+/* DONUT */
+.donut-wrap { display: flex; align-items: center; justify-content: center; gap: 28px; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(–text-secondary); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-val { font-family: ‘IBM Plex Mono’, monospace; font-size: 10px; color: var(–text-primary); margin-left: auto; min-width: 30px; text-align: right; }
+
+/* LINE CHART AREA */
+.line-path { fill: none; stroke-width: 1.5; }
+
+/* DISTRIBUTION BARS */
+.dist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.dist-label { font-family: ‘IBM Plex Mono’, monospace; font-size: 9px; color: var(–text-dim); width: 50px; text-align: right; flex-shrink: 0; }
+.dist-bar-bg { flex: 1; height: 18px; background: rgba(255,255,255,0.04); position: relative; }
+.dist-bar-fill { height: 100%; background: var(–navy-light); position: relative; }
+.dist-bar-fill.highlight { background: linear-gradient(90deg, var(–navy-light), rgba(201,168,76,0.6)); }
+.dist-count { font-family: ‘IBM Plex Mono’, monospace; font-size: 9px; color: var(–text-dim); width: 24px; flex-shrink: 0; }
+
+/* FOOTER */
+.footer {
+margin-top: 20px;
+padding-top: 14px;
+border-top: 1px solid var(–border);
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 20px;
+}
+.rec-section { flex: 1; }
+.rec-title {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 9px;
+letter-spacing: 2px;
+color: var(–gold);
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+.rec-text { font-size: 11px; color: var(–text-secondary); line-height: 1.65; }
+.footer-meta {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 9px;
+color: var(–text-dim);
+text-align: right;
+letter-spacing: 1px;
+line-height: 1.8;
+}
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">Strategic Analytics · Investment Intelligence Report</div>
+    <div class="header-title">Shark Tank <span>India</span> — Deal Performance Dashboard</div>
+    <div class="header-subtitle">Season 1 · 35 Episodes · 117 Pitches · Comprehensive Shark Investment Analysis</div>
+  </div>
+  <div class="header-right">
+    <div class="season-badge">SEASON 01</div>
+    <div>Sony LIV Original Series</div>
+    <div>Dataset: 117 Pitches · 28 Variables</div>
+  </div>
+</div>
+
+<!-- KPI CARDS ROW -->
+
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Pitches</div>
+    <div class="kpi-value">117</div>
+    <div class="kpi-sub">Across 35 Episodes</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Deals Closed</div>
+    <div class="kpi-value gold">65</div>
+    <div class="kpi-sub">of 117 Pitches</div>
+    <div class="kpi-badge">55.6% CLOSE RATE</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Avg Deal Equity</div>
+    <div class="kpi-value">16.1<span style="font-size:16px;color:var(--text-secondary)">%</span></div>
+    <div class="kpi-sub">vs 5.2% Asked</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Avg Valuation Discount</div>
+    <div class="kpi-value gold">50<span style="font-size:16px">%</span></div>
+    <div class="kpi-sub">Median 66.7% haircut</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Top Shark (Deal Rate)</div>
+    <div class="kpi-value" style="font-size:22px;padding-top:4px;">Peyush</div>
+    <div class="kpi-sub">30.7% deal rate · 27 deals</div>
+    <div class="kpi-badge">MOST ACTIVE</div>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD GRID -->
+
+<div class="main-grid">
+
+  <!-- CHART 1: Shark Deal Count Bar Chart (wide) -->
+
+  <div class="chart-card wide">
+    <div class="card-header">
+      <div class="card-title">Shark Investment Activity — Deals Closed vs. Capital Deployed (₹ Lakhs)</div>
+      <div class="card-tag">PERFORMANCE RANKING</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 580 180">
+      <!-- Grid lines -->
+      <line x1="80" y1="20" x2="80" y2="145" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="80" y1="145" x2="575" y2="145" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="80" y1="20" x2="575" y2="20" class="grid-line"/>
+      <line x1="80" y1="57" x2="575" y2="57" class="grid-line"/>
+      <line x1="80" y1="93" x2="575" y2="93" class="grid-line"/>
+
+```
+  <!-- Y axis labels -->
+  <text x="72" y="24" class="axis-text" text-anchor="end">30</text>
+  <text x="72" y="60" class="axis-text" text-anchor="end">20</text>
+  <text x="72" y="97" class="axis-text" text-anchor="end">10</text>
+  <text x="72" y="148" class="axis-text" text-anchor="end">0</text>
+  <text x="10" y="90" class="axis-label" text-anchor="middle" transform="rotate(-90,10,90)">DEALS</text>
+
+  <!-- Sharks: Ashneer=21, Anupam=24, Aman=28, Namita=22, Vineeta=15, Peyush=27, Ghazal=7 -->
+  <!-- Bar width ~50, spacing ~35, start x=95 -->
+  <!-- Max=28, scale: 28→125px range (145-20=125) -->
+
+  <!-- Ashneer: 21 → 21/30*125=87.5 → top=145-87.5=57.5 -->
+  <rect x="95" y="57" width="44" height="88" fill="rgba(30,51,88,0.9)" class="bar-fill"/>
+  <rect x="95" y="57" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="117" y="153" class="axis-text" text-anchor="middle">Ashneer</text>
+  <text x="117" y="52" class="value-label" text-anchor="middle">21</text>
+
+  <!-- Anupam: 24 → 100 → top=45 -->
+  <rect x="170" y="45" width="44" height="100" fill="rgba(30,51,88,0.9)" class="bar-fill"/>
+  <rect x="170" y="45" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="192" y="153" class="axis-text" text-anchor="middle">Anupam</text>
+  <text x="192" y="40" class="value-label" text-anchor="middle">24</text>
+
+  <!-- Aman: 28 → 116.7 → top=28.3 (gold top performer) -->
+  <rect x="245" y="28" width="44" height="117" fill="rgba(35,60,100,0.95)" class="bar-fill"/>
+  <rect x="245" y="28" width="44" height="2" fill="var(--gold)"/>
+  <text x="267" y="153" class="axis-text" text-anchor="middle" style="fill:#C9A84C">Aman</text>
+  <text x="267" y="23" class="value-label" text-anchor="middle" style="fill:#C9A84C">28</text>
+
+  <!-- Namita: 22 → 91.7 → top=53.3 -->
+  <rect x="320" y="53" width="44" height="92" fill="rgba(30,51,88,0.9)" class="bar-fill"/>
+  <rect x="320" y="53" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="342" y="153" class="axis-text" text-anchor="middle">Namita</text>
+  <text x="342" y="48" class="value-label" text-anchor="middle">22</text>
+
+  <!-- Vineeta: 15 → 62.5 → top=82.5 -->
+  <rect x="395" y="82" width="44" height="63" fill="rgba(30,51,88,0.9)" class="bar-fill"/>
+  <rect x="395" y="82" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="417" y="153" class="axis-text" text-anchor="middle">Vineeta</text>
+  <text x="417" y="77" class="value-label" text-anchor="middle">15</text>
+
+  <!-- Peyush: 27 → 112.5 → top=32.5 (gold - highest rate) -->
+  <rect x="470" y="32" width="44" height="113" fill="rgba(35,60,100,0.95)" class="bar-fill"/>
+  <rect x="470" y="32" width="44" height="2" fill="var(--gold)"/>
+  <text x="492" y="153" class="axis-text" text-anchor="middle" style="fill:#C9A84C">Peyush</text>
+  <text x="492" y="27" class="value-label" text-anchor="middle" style="fill:#C9A84C">27</text>
+
+  <!-- Ghazal: 7 → 29.2 → top=115.8 -->
+  <!-- Note: Ghazal only in 26 episodes so shown lighter -->
+  <rect x="545" y="116" width="28" height="29" fill="rgba(44,62,80,0.7)" class="bar-fill"/>
+  <rect x="545" y="116" width="28" height="2" fill="rgba(201,168,76,0.3)"/>
+  <text x="559" y="153" class="axis-text" text-anchor="middle">Ghazal</text>
+  <text x="559" y="111" class="value-label" text-anchor="middle">7</text>
+</svg>
+<div class="insight-box">
+  <div class="insight-label">▸ Insight 01</div>
+  <div class="insight-text">Peyush leads in deal rate (30.7%) while Aman tops absolute deal count; Ghazal's limited presence constrains portfolio breadth despite competitive conversion efficiency.</div>
+</div>
+```
+
+  </div>
+
+  <!-- CHART 2: Shark Deal Rate Ranking Table -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Shark Deal Rate Leaderboard</div>
+      <div class="card-tag">CATEGORY COMPARISON</div>
+    </div>
+    <table class="shark-table">
+      <thead>
+        <tr>
+          <th>Shark</th>
+          <th>Deals</th>
+          <th>Rate & Bar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="rank-num">01</span><span class="shark-name top-shark">Peyush</span></td>
+          <td>27 / 88</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gold)">30.7%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:100%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">02</span><span class="shark-name top-shark">Aman</span></td>
+          <td>28 / 98</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gold)">28.6%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:93%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">03</span><span class="shark-name">Ghazal</span></td>
+          <td>7 / 26</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)">26.9%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:88%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">04</span><span class="shark-name">Vineeta</span></td>
+          <td>15 / 66</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)">22.7%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:74%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">05</span><span class="shark-name">Namita</span></td>
+          <td>22 / 106</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)">20.8%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:68%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">06</span><span class="shark-name">Ashneer</span></td>
+          <td>21 / 98</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)">21.4%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:70%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="rank-num">07</span><span class="shark-name">Anupam</span></td>
+          <td>24 / 117</td>
+          <td>
+            <div class="rate-bar-wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)">20.5%</span>
+              <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:67%"></div></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="insight-box">
+      <div class="insight-label">▸ Insight 02</div>
+      <div class="insight-text">Anupam attended all 117 pitches yet records the lowest deal rate, suggesting stringent criteria rather than disengagement — quality over quantity positioning.</div>
+    </div>
+  </div>
+
+  <!-- CHART 3: Episode Deal Rate Line Chart (full width) -->
+
+  <div class="chart-card full">
+    <div class="card-header">
+      <div class="card-title">Episode-by-Episode Deal Closure Rate — Trend Analysis (Episodes 1–35)</div>
+      <div class="card-tag">TREND IDENTIFICATION</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 860 140">
+      <!-- Grid -->
+      <line x1="30" y1="10" x2="30" y2="110" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="30" y1="110" x2="855" y2="110" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="30" y1="10" x2="855" y2="10" class="grid-line"/>
+      <line x1="30" y1="35" x2="855" y2="35" class="grid-line"/>
+      <line x1="30" y1="60" x2="855" y2="60" class="grid-line"/>
+      <line x1="30" y1="85" x2="855" y2="85" class="grid-line"/>
+
+```
+  <!-- Y labels -->
+  <text x="25" y="13" class="axis-text" text-anchor="end">100%</text>
+  <text x="25" y="38" class="axis-text" text-anchor="end">75%</text>
+  <text x="25" y="63" class="axis-text" text-anchor="end">50%</text>
+  <text x="25" y="88" class="axis-text" text-anchor="end">25%</text>
+  <text x="25" y="113" class="axis-text" text-anchor="end">0%</text>
+
+  <!-- Average line at 55.6% → 55.6% from top of 100px range = 44.4px from top+10 = 54.4 -->
+  <line x1="30" y1="54" x2="855" y2="54" stroke="rgba(201,168,76,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="858" y="57" style="font-family:'IBM Plex Mono',monospace;font-size:8px;fill:rgba(201,168,76,0.6)">AVG</text>
+
+  <!-- Area fill -->
+  <!-- rates: 100,33.3,66.7,66.7,33.3,66.7,33.3,100,66.7,100,66.7,66.7,100,33.3,100,75,75,25,25,66.7,100,25,25,66.7,66.7,66.7,50,66.7,33.3,25,25,25,75,25,33.3 -->
+  <!-- x per episode: start=35, step=23.5, 35 eps -->
+  <!-- y = 10 + (1-rate/100)*100 -->
+  <!-- precomputed (x,y): -->
+  <defs>
+    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(30,51,88,0.5)"/>
+      <stop offset="100%" stop-color="rgba(30,51,88,0.05)"/>
+    </linearGradient>
+  </defs>
+  <polygon fill="url(#areaGrad)" points="
+    35,110
+    35,10 58,77 81,43 105,43 128,77 151,43 174,77 198,10 221,43 244,10 267,43 291,43 314,10 337,77 360,10 384,35 407,35 430,85 453,85 477,43 500,10 523,85 547,85 570,43 593,43 616,43 640,60 663,43 686,77 710,85 733,85 756,85 780,35 803,85 827,77
+    827,110"/>
+  <!-- Line -->
+  <polyline fill="none" stroke="rgba(100,140,190,0.8)" stroke-width="1.5"
+    points="35,10 58,77 81,43 105,43 128,77 151,43 174,77 198,10 221,43 244,10 267,43 291,43 314,10 337,77 360,10 384,35 407,35 430,85 453,85 477,43 500,10 523,85 547,85 570,43 593,43 616,43 640,60 663,43 686,77 710,85 733,85 756,85 780,35 803,85 827,77"/>
+  <!-- Gold dots for 100% -->
+  <circle cx="35" cy="10" r="3" fill="var(--gold)"/>
+  <circle cx="198" cy="10" r="3" fill="var(--gold)"/>
+  <circle cx="244" cy="10" r="3" fill="var(--gold)"/>
+  <circle cx="314" cy="10" r="3" fill="var(--gold)"/>
+  <circle cx="360" cy="10" r="3" fill="var(--gold)"/>
+  <circle cx="500" cy="10" r="3" fill="var(--gold)"/>
+  <!-- X labels (selective) -->
+  <text x="35" y="125" class="axis-text" text-anchor="middle">E1</text>
+  <text x="128" y="125" class="axis-text" text-anchor="middle">E5</text>
+  <text x="244" y="125" class="axis-text" text-anchor="middle">E10</text>
+  <text x="360" y="125" class="axis-text" text-anchor="middle">E15</text>
+  <text x="477" y="125" class="axis-text" text-anchor="middle">E20</text>
+  <text x="593" y="125" class="axis-text" text-anchor="middle">E25</text>
+  <text x="710" y="125" class="axis-text" text-anchor="middle">E30</text>
+  <text x="827" y="125" class="axis-text" text-anchor="middle">E35</text>
+  <text x="440" y="138" class="axis-label" text-anchor="middle">EPISODE NUMBER ●  GOLD DOTS = 100% DEAL EPISODES</text>
+</svg>
+<div class="insight-box">
+  <div class="insight-label">▸ Insight 03</div>
+  <div class="insight-text">Deal rates peak sharply in episodes 1–15 then decline post-episode 18, indicating shark selectivity increases as season progresses and novelty wanes.</div>
+</div>
+```
+
+  </div>
+
+  <!-- CHART 4: Equity Asked vs Received Comparison -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Equity Negotiation — Asked vs. Secured</div>
+      <div class="card-tag">INVESTMENT BEHAVIOUR</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 260 180">
+      <!-- Two large comparison bars -->
+      <text x="130" y="20" class="axis-label" text-anchor="middle">EQUITY STAKE (%)</text>
+
+```
+  <!-- Asked: 5.2% -->
+  <text x="65" y="50" class="axis-text" text-anchor="middle">ASKED</text>
+  <rect x="20" y="60" width="90" height="60" fill="rgba(30,51,88,0.6)" stroke="rgba(30,51,88,0.9)" stroke-width="1"/>
+  <rect x="20" y="60" width="90" height="2" fill="rgba(100,140,190,0.6)"/>
+  <text x="65" y="97" style="font-family:'Playfair Display',serif;font-size:28px;fill:#8DA0B4;font-weight:700" text-anchor="middle">5.2%</text>
+  <text x="65" y="112" class="axis-text" text-anchor="middle">avg equity asked</text>
+
+  <!-- Arrow -->
+  <text x="130" y="95" style="font-size:18px;fill:var(--gold)" text-anchor="middle">→</text>
+
+  <!-- Secured: 16.1% -->
+  <text x="195" y="50" class="axis-text" text-anchor="middle" style="fill:var(--gold)">SECURED</text>
+  <rect x="150" y="60" width="90" height="60" fill="rgba(35,55,90,0.9)" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
+  <rect x="150" y="60" width="90" height="2" fill="var(--gold)"/>
+  <text x="195" y="97" style="font-family:'Playfair Display',serif;font-size:28px;fill:var(--gold);font-weight:700" text-anchor="middle">16.1%</text>
+  <text x="195" y="112" class="axis-text" text-anchor="middle">avg equity secured</text>
+
+  <!-- Delta -->
+  <rect x="20" y="135" width="220" height="28" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.2)" stroke-width="1"/>
+  <text x="130" y="148" style="font-family:'IBM Plex Mono',monospace;font-size:9px;fill:var(--gold-light);letter-spacing:1px" text-anchor="middle">SHARKS EXTRACT +3.1× MORE EQUITY THAN ASKED</text>
+  <text x="130" y="160" class="axis-text" text-anchor="middle">Avg deal amount: ₹56L vs ₹320L asked</text>
+</svg>
+<div class="insight-box">
+  <div class="insight-label">▸ Insight 04</div>
+  <div class="insight-text">Sharks secure 3.1× the equity founders initially offer, while funding only 17.5% of requested capital, revealing extreme negotiating asymmetry favoring investors.</div>
+</div>
+```
+
+  </div>
+
+  <!-- CHART 5: Multi-Shark Collaboration Donut -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Syndication Pattern — Sharks Per Deal</div>
+      <div class="card-tag">DISTRIBUTION</div>
+    </div>
+    <div class="donut-wrap" style="margin-top:8px">
+      <svg viewBox="0 0 130 130" width="130" height="130">
+        <!-- Total deals = 65. 1 shark=22, 2=19, 3=14, 4=5, 5=4, 0 deals=1(anomaly skip) -->
+        <!-- Proportions: 22/64=34.4%, 19/64=29.7%, 14/64=21.9%, 5/64=7.8%, 4/64=6.3% -->
+        <!-- Circumference of r=45: 2π×45=282.7 -->
+        <!-- Dash values: 97.2, 83.9, 61.9, 22.1, 17.8 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="18"/>
+        <!-- 1 shark: 97.2, offset=0 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="#1E3358" stroke-width="18" stroke-dasharray="97.2 185.5" stroke-dashoffset="70.7" transform="rotate(-90 65 65)"/>
+        <!-- 2 sharks: 83.9, offset=97.2 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="#2A4C7A" stroke-width="18" stroke-dasharray="83.9 198.8" stroke-dashoffset="-26.5" transform="rotate(-90 65 65)"/>
+        <!-- 3 sharks: 61.9 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="#3A6099" stroke-width="18" stroke-dasharray="61.9 220.8" stroke-dashoffset="-110.4" transform="rotate(-90 65 65)"/>
+        <!-- 4 sharks: 22.1 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="#C9A84C" stroke-width="18" stroke-dasharray="22.1 260.6" stroke-dashoffset="-172.3" transform="rotate(-90 65 65)"/>
+        <!-- 5 sharks: 17.8 -->
+        <circle cx="65" cy="65" r="45" fill="none" stroke="#E3C06A" stroke-width="18" stroke-dasharray="17.8 264.9" stroke-dashoffset="-194.4" transform="rotate(-90 65 65)"/>
+        <!-- Center text -->
+        <text x="65" y="60" style="font-family:'Playfair Display',serif;font-size:20px;fill:#F5F7FA;font-weight:700" text-anchor="middle">64</text>
+        <text x="65" y="74" style="font-family:'IBM Plex Mono',monospace;font-size:7px;fill:#4E6478;letter-spacing:1px" text-anchor="middle">TOTAL DEALS</text>
+      </svg>
+      <div class="donut-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1E3358"></div>Solo Deal<span class="legend-val">22</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2A4C7A"></div>2 Sharks<span class="legend-val">19</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3A6099"></div>3 Sharks<span class="legend-val">14</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>4 Sharks<span class="legend-val">5</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E3C06A"></div>5 Sharks<span class="legend-val">4</span></div>
+      </div>
+    </div>
+    <div class="insight-box" style="margin-top:16px">
+      <div class="insight-label">▸ Insight 05</div>
+      <div class="insight-text">Over 64% of deals involve 2+ sharks, confirming syndication as dominant strategy; solo deals at 34% suggest sharks hedge risk via co-investment in uncertain pitches.</div>
+    </div>
+  </div>
+
+  <!-- CHART 6: Ask Amount Distribution Histogram -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Pitcher Ask Amount Distribution (₹ Lakhs)</div>
+      <div class="card-tag">DATA DISTRIBUTION</div>
+    </div>
+    <!-- bins: 0-25: 7, 25-50: 58, 50-75: 22, 75-100: 23, 100-200: 5, 200+: 2 -->
+    <!-- max=58, scale each bar to max width ~180px -->
+    <div style="margin-top:4px">
+      <div class="dist-row">
+        <div class="dist-label">0-25L</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:21.7%"></div></div>
+        <div class="dist-count">7</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">25-50L</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill highlight" style="width:100%"></div></div>
+        <div class="dist-count" style="color:var(--gold)">58</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">50-75L</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:37.9%"></div></div>
+        <div class="dist-count">22</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">75-100L</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:39.7%"></div></div>
+        <div class="dist-count">23</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">100-200L</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:8.6%"></div></div>
+        <div class="dist-count">5</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">200L+</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:3.4%"></div></div>
+        <div class="dist-count">2</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--text-dim)">
+      ● MEDIAN ASK: ₹50L &nbsp;&nbsp; ● MODE BAND: ₹25-50L (49.6% of pitches)
+    </div>
+    <div class="insight-box">
+      <div class="insight-label">▸ Insight 06</div>
+      <div class="insight-text">Nearly 50% of founders cluster asks at ₹25–50L, suggesting a perceived "acceptable ask" threshold; outliers above ₹200L face markedly lower acceptance probability.</div>
+    </div>
+  </div>
+
+  <!-- CHART 7: Valuation Haircut Comparison -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Valuation: Asked vs. Deal Closed (₹ Lakhs)</div>
+      <div class="card-tag">BEHAVIOUR PATTERN</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 260 170">
+      <!-- Two semicircle gauges showing valuation compression -->
+      <text x="130" y="18" class="axis-label" text-anchor="middle">MEDIAN VALUATION (₹ LAKHS)</text>
+
+```
+  <!-- Asked valuation bar: median 1250 vs deal 416 -->
+  <text x="60" y="40" class="axis-text" text-anchor="middle">ASK VALUATION</text>
+  <rect x="10" y="48" width="100" height="16" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <rect x="10" y="48" width="100" height="16" fill="rgba(30,51,88,0.8)"/>
+  <text x="60" y="60" style="font-family:'IBM Plex Mono',monospace;font-size:10px;fill:#8DA0B4" text-anchor="middle">₹1,250L MEDIAN</text>
+
+  <text x="60" y="82" class="axis-text" text-anchor="middle">DEAL VALUATION</text>
+  <rect x="10" y="90" width="100" height="16" fill="rgba(255,255,255,0.04)" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+  <rect x="10" y="90" width="33.3" height="16" fill="rgba(201,168,76,0.35)"/>
+  <text x="60" y="102" style="font-family:'IBM Plex Mono',monospace;font-size:10px;fill:var(--gold)" text-anchor="middle">₹416L MEDIAN</text>
+
+  <!-- Big percentage callout -->
+  <rect x="150" y="38" width="100" height="78" fill="rgba(201,168,76,0.07)" stroke="rgba(201,168,76,0.25)" stroke-width="1"/>
+  <text x="200" y="65" style="font-family:'Playfair Display',serif;font-size:36px;fill:var(--gold);font-weight:700" text-anchor="middle">67%</text>
+  <text x="200" y="82" style="font-family:'IBM Plex Mono',monospace;font-size:8px;fill:var(--gold-dim);letter-spacing:1px" text-anchor="middle">MEDIAN</text>
+  <text x="200" y="95" style="font-family:'IBM Plex Mono',monospace;font-size:8px;fill:var(--gold-dim);letter-spacing:1px" text-anchor="middle">HAIRCUT</text>
+  <text x="200" y="110" style="font-family:'IBM Plex Mono',monospace;font-size:8px;fill:var(--text-dim)" text-anchor="middle">on valuation</text>
+
+  <!-- scale reference -->
+  <line x1="10" y1="120" x2="110" y2="120" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="10" y="132" class="axis-text">0</text>
+  <text x="110" y="132" class="axis-text" text-anchor="end">₹1,250L</text>
+  <text x="43" y="132" class="axis-text" style="fill:var(--gold)">₹416L</text>
+  <line x1="43.3" y1="115" x2="43.3" y2="125" stroke="var(--gold)" stroke-width="1.5"/>
+
+  <text x="130" y="155" class="axis-text" text-anchor="middle" style="fill:var(--text-dim)">Average haircut: 50.4% · Median: 66.7%</text>
+</svg>
+<div class="insight-box">
+  <div class="insight-label">▸ Insight 07</div>
+  <div class="insight-text">Sharks apply a median 66.7% valuation haircut on accepted deals; founders who anchor high face steeper discounts, rewarding conservative, realistic valuations.</div>
+</div>
+```
+
+  </div>
+
+  <!-- CHART 8: Capital Deployed by Shark Bar -->
+
+  <div class="chart-card wide">
+    <div class="card-header">
+      <div class="card-title">Total Capital Deployed per Shark (₹ Lakhs) — Investment Portfolio Size</div>
+      <div class="card-tag">PERFORMANCE RANKING</div>
+    </div>
+    <!-- Aman=1775, Peyush=1556, Namita=1445, Anupam=1346, Ashneer=1316, Vineeta=930, Ghazal=415 -->
+    <!-- Max=1775, scale to 440px range -->
+    <svg class="chart-svg" viewBox="0 0 580 160">
+      <line x1="80" y1="15" x2="80" y2="120" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="80" y1="120" x2="576" y2="120" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="80" y1="15" x2="576" y2="15" class="grid-line"/>
+      <line x1="80" y1="48" x2="576" y2="48" class="grid-line"/>
+      <line x1="80" y1="82" x2="576" y2="82" class="grid-line"/>
+
+```
+  <text x="72" y="18" class="axis-text" text-anchor="end">₹1800</text>
+  <text x="72" y="52" class="axis-text" text-anchor="end">₹1200</text>
+  <text x="72" y="86" class="axis-text" text-anchor="end">₹600</text>
+  <text x="72" y="123" class="axis-text" text-anchor="end">₹0</text>
+
+  <!-- Horizontal gradient bars: Aman=1775→442px, Peyush=1556→387, Namita=1445→360, Anupam=1346→335, Ashneer=1316→328, Vineeta=930→232, Ghazal=415→103 -->
+  <!-- Scale: height=105/(1800/1800)=105px for max. barH=14, gap=1 -->
+  <!-- Aman y=15, h=98.6 -->
+  <rect x="95" y="15" width="44" height="105" fill="rgba(42,76,122,0.95)"/>
+  <rect x="95" y="15" width="44" height="2" fill="var(--gold)"/>
+  <text x="117" y="133" class="axis-text" text-anchor="middle" style="fill:#C9A84C">Aman</text>
+  <text x="117" y="11" class="value-label" text-anchor="middle" style="fill:#C9A84C">₹1,775</text>
+
+  <!-- Peyush=1556 → 91.2 -->
+  <rect x="170" y="28" width="44" height="92" fill="rgba(38,68,108,0.95)"/>
+  <rect x="170" y="28" width="44" height="2" fill="var(--gold)"/>
+  <text x="192" y="133" class="axis-text" text-anchor="middle" style="fill:#C9A84C">Peyush</text>
+  <text x="192" y="24" class="value-label" text-anchor="middle" style="fill:#C9A84C">₹1,556</text>
+
+  <!-- Namita=1445 → 84.7 -->
+  <rect x="245" y="35" width="44" height="85" fill="rgba(30,51,88,0.9)"/>
+  <rect x="245" y="35" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="267" y="133" class="axis-text" text-anchor="middle">Namita</text>
+  <text x="267" y="31" class="value-label" text-anchor="middle">₹1,445</text>
+
+  <!-- Anupam=1346 → 78.9 -->
+  <rect x="320" y="41" width="44" height="79" fill="rgba(30,51,88,0.9)"/>
+  <rect x="320" y="41" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="342" y="133" class="axis-text" text-anchor="middle">Anupam</text>
+  <text x="342" y="37" class="value-label" text-anchor="middle">₹1,346</text>
+
+  <!-- Ashneer=1316 → 77.1 -->
+  <rect x="395" y="43" width="44" height="77" fill="rgba(30,51,88,0.9)"/>
+  <rect x="395" y="43" width="44" height="2" fill="rgba(201,168,76,0.5)"/>
+  <text x="417" y="133" class="axis-text" text-anchor="middle">Ashneer</text>
+  <text x="417" y="39" class="value-label" text-anchor="middle">₹1,316</text>
+
+  <!-- Vineeta=930 → 54.5 -->
+  <rect x="470" y="65" width="44" height="55" fill="rgba(25,40,65,0.9)"/>
+  <rect x="470" y="65" width="44" height="2" fill="rgba(201,168,76,0.3)"/>
+  <text x="492" y="133" class="axis-text" text-anchor="middle">Vineeta</text>
+  <text x="492" y="61" class="value-label" text-anchor="middle">₹930</text>
+
+  <!-- Ghazal=415 → 24.3 -->
+  <rect x="545" y="96" width="28" height="24" fill="rgba(22,36,55,0.8)"/>
+  <rect x="545" y="96" width="28" height="2" fill="rgba(201,168,76,0.2)"/>
+  <text x="559" y="133" class="axis-text" text-anchor="middle">Ghazal</text>
+  <text x="559" y="92" class="value-label" text-anchor="middle">₹415</text>
+</svg>
+<div class="insight-box">
+  <div class="insight-label">▸ Insight 08</div>
+  <div class="insight-text">Aman deploys 4.3× more capital than Ghazal despite only 4× more deals, indicating larger average ticket sizes and preference for capital-intensive, scalable ventures.</div>
+</div>
+```
+
+  </div>
+
+  <!-- CHART 9: Equity Ask Distribution (Histogram bars) -->
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">Equity Ask Concentration — Pitch Frequency by Band</div>
+      <div class="card-tag">DATA DISTRIBUTION</div>
+    </div>
+    <!-- bins: 0-5%: 84, 5-10%: 29, 10-15%: 2, 15-20%: 1, 20+%: 1 -->
+    <div style="margin-top:8px">
+      <div class="dist-row">
+        <div class="dist-label">0–5%</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill highlight" style="width:100%"></div></div>
+        <div class="dist-count" style="color:var(--gold)">84</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">5–10%</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:34.5%"></div></div>
+        <div class="dist-count">29</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">10–15%</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:2.4%"></div></div>
+        <div class="dist-count">2</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">15–20%</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:1.2%"></div></div>
+        <div class="dist-count">1</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label">20%+</div>
+        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:1.2%"></div></div>
+        <div class="dist-count">1</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--text-dim)">
+      ● AVG ASKED: 5.2% &nbsp;●&nbsp; AVG SECURED: 16.1% &nbsp;●&nbsp; 71.8% pitched &lt;5% equity
+    </div>
+    <div class="insight-box">
+      <div class="insight-label">▸ Insight 09</div>
+      <div class="insight-text">71.8% of founders offer sub-5% equity, fundamentally underestimating shark expectations; this low-offer strategy consistently triggers aggressive counter-equity demands.</div>
+    </div>
+  </div>
+
+</div><!-- /main-grid -->
+
+<!-- FOOTER: RECOMMENDATIONS -->
+
+<div class="footer">
+  <div class="rec-section">
+    <div class="rec-title">▸ Strategic Recommendations</div>
+    <div class="rec-text">
+      Founders should anchor asks near ₹40–50L with 8–12% equity to align with shark deal norms, avoiding the 3.1× equity penalty of under-offering. Targeting Peyush or Aman increases deal probability by 35–50% over average. Syndicated pitches attract multi-shark participation; structuring deals for co-investment signals scale. Early episode timing correlates with higher acceptance — producers and founders should capitalise on this seasonal pattern.
+    </div>
+  </div>
+  <div class="footer-meta">
+    <div style="color:var(--gold);margin-bottom:4px;letter-spacing:2px">SHARK TANK INDIA S01</div>
+    <div>117 pitches · 35 episodes</div>
+    <div>7 sharks · 28 variables</div>
+    <div style="margin-top:6px;color:var(--text-dim)">Analytics Consulting Report</div>
+    <div style="color:var(--text-dim)">© Strategic Intelligence Unit</div>
+  </div>
+</div>
+
+</body>
+</html>
